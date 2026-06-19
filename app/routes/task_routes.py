@@ -2,6 +2,7 @@ from flask import Blueprint,request
 from flask_jwt_extended import get_jwt_identity,jwt_required
 from app.extensions import db
 from app.models.task_models import Task
+from app.models.user_models import User
 from app.models.task_assignment_model import TaskAssignment
 from datetime import datetime
 
@@ -137,3 +138,33 @@ def delete_task(task_id):
     db.session.commit()
     return {"message":"task deleted successfully",
             "task_id": task_id},200
+
+@task_bp.route("/tasks/<int:task_id>/assign",methods = ["POST"])
+@jwt_required()
+def assign_task(task_id):
+    user_id = int(get_jwt_identity())
+    task = db.session.get(Task,task_id)
+    if not task:
+        return {"message":"task not found"},404
+    
+    if task.created_by != user_id:
+        return {"message":"forbidden"},403
+    
+    data = request.get_json()
+    if not data :
+        return {"message":"invalid input"},400
+    
+    to_assign = data.get("user_id")
+    if not (User.query.filter_by(user_id = to_assign).first()):
+        return {"message":"user does not exist"},404
+    if  (TaskAssignment.query.filter_by(user_id = to_assign,task_id = task_id).first()):
+        return {"message":"user already assigned"},409
+    
+    task_assigned = TaskAssignment(user_id = to_assign,task_id = task_id)
+    db.session.add(task_assigned)
+    db.session.commit()
+    
+    return {"message":"task assigned successful",
+            "assigned_by":user_id,
+            "assigned_to":task_assigned.user_id,
+            "task":task_assigned.task_id},201
