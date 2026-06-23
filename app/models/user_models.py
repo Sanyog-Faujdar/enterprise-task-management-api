@@ -11,6 +11,6 @@ class User(db.Model):
     created_at = db.Column(db.DateTime,default = datetime.utcnow)
     role = db.Column(db.String(50),nullable=False,default="member")
     
-    ROLE_OWNER = "owner"
+    ROLE_ADMIN = "admin"
     ROLE_PROJECT_HEAD = "project_head"
     ROLE_MEMBER = "member"
