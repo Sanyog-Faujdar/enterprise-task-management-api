@@ -12,6 +12,7 @@ def create_app():
     from app.models.user_models import User
     from app.models.task_models import Task
     from app.models.task_assignment_model import TaskAssignment
+    from app.models.activity_log_model import ActivityLog
     migrate.init_app(app,db)
     
     jwt.init_app(app)
