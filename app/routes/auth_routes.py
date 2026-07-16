@@ -3,6 +3,8 @@ from werkzeug.security import  generate_password_hash,check_password_hash
 from app.extensions import db
 from app.models.user_models import User
 from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity
+from flasgger import swag_from
+from app.docs.auth_docs import register_docs, login_docs
 
 auth_bp = Blueprint('auth',__name__)
 
@@ -20,6 +22,7 @@ def profile():
     }
 
 @auth_bp.route('/login',methods=["POST"])
+@swag_from(login_docs)
 def login():
     data = request.get_json()
     if not data :
@@ -46,6 +49,7 @@ def login():
         "access_token": access_token},200
 
 @auth_bp.route("/register",methods = ["POST"])
+@swag_from(register_docs)
 def register():
     data = request.get_json()
     name = data.get("name")

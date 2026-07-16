@@ -8,12 +8,17 @@ from app.models.activity_log_model import ActivityLog
 from datetime import datetime , date
 from app.utils.activity_logger import create_log
 from app.services.dashboard_service import get_head_dashboard , get_member_dashboard , get_admin_dashboard
+from app.docs.task_docs import create_task_docs,assign_head_docs,assign_member_docs,get_tasks_docs,get_task_docs,task_modification_docs,delete_task_docs,restore_task_docs
+from app.docs.logs_docs import get_logs_docs
+from app.docs.dashboard_docs import get_dashboard_docs
+from flasgger import swag_from
 
 task_bp = Blueprint('task',__name__)
-VALID_STATUSES = {STATUS_CREATED,STATUS_ASSIGNED,STATUS_IN_PROGRESS,STATUS_UNDER_REVIEW,STATUS_COMPLETED,STATUS_CLOSED}
+VALID_STATUSES = {Task.STATUS_CREATED,Task.STATUS_ASSIGNED,Task.STATUS_IN_PROGRESS,Task.STATUS_UNDER_REVIEW,Task.STATUS_COMPLETED,Task.STATUS_CLOSED}
 
 @task_bp.route('/tasks',methods=["GET"])
 @jwt_required()
+@swag_from(get_tasks_docs)
 def get_tasks():
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
@@ -33,6 +38,7 @@ def get_tasks():
 
 @task_bp.route('/tasks/<int:task_id>',methods=["GET"])
 @jwt_required()
+@swag_from(get_task_docs)
 def get_task(task_id):
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
@@ -62,6 +68,7 @@ def get_task(task_id):
 
 @task_bp.route('/tasks',methods = ["POST"])
 @jwt_required()
+@swag_from(create_task_docs)
 def create_task():
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
@@ -104,6 +111,7 @@ def create_task():
 
 @task_bp.route("/tasks/<int:task_id>",methods=["PUT"])
 @jwt_required()
+@swag_from(task_modification_docs)
 def put_tasks(task_id):
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
@@ -158,6 +166,7 @@ def put_tasks(task_id):
 
 @task_bp.route("/tasks/<int:task_id>",methods=["DELETE"])
 @jwt_required()
+@swag_from(delete_task_docs)
 def delete_task(task_id):
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
@@ -183,6 +192,7 @@ def delete_task(task_id):
 
 @task_bp.route("/tasks/<int:task_id>/assign-member",methods = ["POST"])
 @jwt_required()
+@swag_from(assign_member_docs)
 def assign_task_to_member(task_id):
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
@@ -229,6 +239,7 @@ def assign_task_to_member(task_id):
 
 @task_bp.route("/tasks/<int:task_id>/assign-head",methods = ["POST"])
 @jwt_required()
+@swag_from(assign_head_docs)
 def assign_project_head(task_id):
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
@@ -263,8 +274,9 @@ def assign_project_head(task_id):
             "assigned_to":task.project_head_id,
             "task":task_id},201 
 
-task_bp.route("/logs",methods = ["GET"])
+@task_bp.route("/logs",methods = ["GET"])
 @jwt_required()
+@swag_from(get_logs_docs)
 def get_logs():
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
@@ -325,8 +337,9 @@ def get_logs():
             }for log in logs.items]
         },200
 
-task_bp.route("/tasks/<int:task_id>/restore",methods = ["PATCH"])
+@task_bp.route("/tasks/<int:task_id>/restore",methods = ["PATCH"])
 @jwt_required()
+@swag_from(restore_task_docs)
 def task_restore(task_id):
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
@@ -350,8 +363,9 @@ def task_restore(task_id):
     return {"message":"task restored from recycle bin",
             "task_id":task.task_id},200
 
-task_bp.route("/dashboard",methods=["GET"])
+@task_bp.route("/dashboard",methods=["GET"])
 @jwt_required()
+@swag_from(get_dashboard_docs)
 def see_dashborad():
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)

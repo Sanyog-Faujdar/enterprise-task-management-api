@@ -12,6 +12,9 @@ class Task(db.Model):
     project_head_id = db.Column(db.Integer,db.ForeignKey("users.user_id"),nullable=True)
     created_at = db.Column(db.DateTime,default = datetime.utcnow)
     deadline = db.Column(db.Date,nullable = False)
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
+    deleted_at = db.Column(db.DateTime)
+    deleted_by = db.Column(db.Integer, db.ForeignKey("users.user_id"))
     
     STATUS_CREATED = "created"
     STATUS_ASSIGNED = "assigned"

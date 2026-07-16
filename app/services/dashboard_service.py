@@ -52,8 +52,6 @@ def get_admin_dashboard():
     "logs_today": logs_today
     } }, 200
 
-
-
 def get_head_dashboard(current_user):
     #users 
     members = db.session.query(TaskAssignment.member_id).join(Task).filter(Task.project_head_id == current_user.user_id).distinct().count() 
@@ -84,8 +82,6 @@ def get_head_dashboard(current_user):
         "activity":{
             "logs_today":logs_today
         }},200
-
-
 
 def get_member_dashboard(current_user):
     tasks = Task.query.join(TaskAssignment).filter(TaskAssignment.member_id == current_user.user_id,Task.is_deleted == False)
