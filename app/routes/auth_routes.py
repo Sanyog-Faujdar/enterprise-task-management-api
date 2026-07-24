@@ -4,12 +4,13 @@ from app.extensions import db
 from app.models.user_models import User
 from flask_jwt_extended import create_access_token,jwt_required,get_jwt_identity
 from flasgger import swag_from
-from app.docs.auth_docs import register_docs, login_docs
+from app.docs.auth_docs import register_docs, login_docs,profile_docs,users_docs,assign_role_docs
 
 auth_bp = Blueprint('auth',__name__)
 
 @auth_bp.route("/profile",methods=["GET"]) #protect route
 @jwt_required()
+@swag_from(profile_docs)
 def profile():
     user_id = int(get_jwt_identity())
     user = db.session.get(User,user_id)
@@ -19,7 +20,7 @@ def profile():
         "name":user.name,
         "email":user.email,
         "role":user.role
-    }
+    },200
 
 @auth_bp.route('/login',methods=["POST"])
 @swag_from(login_docs)
@@ -78,10 +79,11 @@ def register():
 
 @auth_bp.route("/users",methods=["GET"])
 @jwt_required()
+@swag_from(users_docs)
 def users():
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
-    if User.ROLE_OWNER !=  current_user.role:
+    if User.ROLE_ADMIN !=  current_user.role:
         return {"message":"forbidden"},403
     
     users = User.query.all()
@@ -93,10 +95,11 @@ def users():
 
 @auth_bp.route("/users/<int:user_id>/role",methods=["POST"])
 @jwt_required()
+@swag_from(assign_role_docs)
 def assign_role(user_id):
     current_user_id = int(get_jwt_identity())
     current_user = db.session.get(User,current_user_id)
-    if current_user.role != User.ROLE_OWNER:
+    if current_user.role != User.ROLE_ADMIN:
         return {"message":"forbidden"},403
     
     target_user = db.session.get(User,user_id)

@@ -92,7 +92,10 @@ def get_member_dashboard(current_user):
     #activity log 
     today_start = datetime.combine(date.today(), datetime.min.time())
     today_end = datetime.combine(date.today(), datetime.max.time())
-    logs_today = ActivityLog.query.join(TaskAssignment).filter(TaskAssignment.member_id == current_user.user_id,ActivityLog.created_at >= today_start,ActivityLog.created_at <= today_end).count()
+    logs_today = (ActivityLog.query
+                  .join(Task, ActivityLog.task_id == Task.task_id)
+                  .join(TaskAssignment, Task.task_id == TaskAssignment.task_id)
+                  .filter(TaskAssignment.member_id == current_user.user_id,ActivityLog.created_at >= today_start,ActivityLog.created_at <= today_end).count())
     return {
         "tasks":{
             "total":total,

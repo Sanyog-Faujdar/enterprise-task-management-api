@@ -282,28 +282,21 @@ task_modification_docs = {
         "schema": {
             "type": "object",
             "properties": {
-                "title":{
-                    "type":"string",
-                    "description":"short title of the task.",
-                    "example":"create a Enterprise Model"
-                },
-                "description":{
-                    "type":"string",
-                    "description":"for more details related to work ,it's optional.",
-                    "example":"An Enterprise Model for CRUD operations"
-                },
-                "deadline":{
-                    "type":"string",
-                    "format":"date",
-                    "description":"Deadline in YYYY-MM-DD format.",
-                    "example":"2026-09-12"
-                },
-                "status":{
-                    "type":"string",
-                    "description":"current task status.",
-                    "enum":["created","assigned","in_progress","under_review","completed","closed"],
-                    "example": "in_progress"
-                }
+                "title": {"type": "string"},
+            "description": {"type": "string"},
+            "deadline": {
+                "type": "string",
+                "format": "date"
+            },
+            "status": {
+                "type": "string",
+                "enum": [
+                    "TASK_CREATED",
+                    "ASSIGNED",
+                    "IN_PROGRESS",
+                    "COMPLETED"
+                ]
+            }
             }
         }     
     }],

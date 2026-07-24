@@ -185,7 +185,7 @@ def delete_task(task_id):
     task.is_deleted = True
     task.deleted_by = current_user_id
     task.deleted_at = datetime.utcnow()
-    create_log(task.task_id,current_user_id,ActivityLog.ACTION_DELETED,f"task move to recycle bin")
+    create_log(task.task_id,current_user_id,ActivityLog.ACTION_DELET,f"task move to recycle bin")
     db.session.commit()
     return {"message":"task moved to recycle bin",
             "task_id": task_id},200
@@ -229,7 +229,7 @@ def assign_task_to_member(task_id):
     task_assigned = TaskAssignment(member_id = to_assign,task_id = task_id)
     db.session.add(task_assigned)
     db.session.flush()
-    create_log(task.task_id,current_user_id,ActivityLog.ACTION_MEMBER_ASSIGNED,f"Assigned {target_user.name} as member")
+    create_log(task.task_id,current_user_id,ActivityLog.ACTION_MEMBER_ASSIGN,f"Assigned {target_user.name} as member")
     db.session.commit() 
     
     return {"message":"task assigned successful",
@@ -255,9 +255,14 @@ def assign_project_head(task_id):
         return {"message":"inavlid inpiut"},400
     
     head_id = data.get("project_head_id")
+    if not head_id:
+        return {"message": "project_head_id is required"}, 400
     head = db.session.get(User,head_id)
     if not head:
         return {"message":"user not found"},404
+    
+    if head.role == User.ROLE_MEMBER:
+        head.role = User.ROLE_PROJECT_HEAD
     
     if head.role != User.ROLE_PROJECT_HEAD:
         return {"message":"user is not a project head"},400
