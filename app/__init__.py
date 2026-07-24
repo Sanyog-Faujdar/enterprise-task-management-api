@@ -43,12 +43,12 @@ def create_app():
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(task_bp)
+    
+    @app.route("/")
+    def home():
+        return {
+            "status": "running",
+            "project": "Enterprise Task Management API",
+            "docs": "/apidocs/"
+        }, 200
     return app
-
-@app.route("/")
-def home():
-    return {
-        "status": "running",
-        "project": "Enterprise Task Management API",
-        "docs": "/apidocs/"
-    }, 200
