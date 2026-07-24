@@ -8,42 +8,22 @@ from flasgger import Swagger
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    
+
     db.init_app(app)
+
     from app.models.user_models import User
     from app.models.task_models import Task
     from app.models.task_assignment_model import TaskAssignment
     from app.models.activity_log_model import ActivityLog
-    migrate.init_app(app,db)
-    
+
+    migrate.init_app(app, db)
     jwt.init_app(app)
-    swagger_template = {
-        "swagger":"2.0",
-        "info":{
-            "title":"Enterprise Task Manangement API",
-            "description":"REST API built with flask , PostgreSQL and JWT Authentication featuring RBAC , Activity Logs , Dashboard analytics and Task Workflow.",
-            "version":"1.0.0",
-            "contact":{
-                "name":"Sanyog Faujdar"
-            }
-        }, 
-        "securityDefinitions":{
-            "Bearer":{
-                "type":"apiKey",
-                "name":"Authorization",
-                "in":"header",
-                "description":(
-                    "Enter JWT token in this format:\n\n"
-                    "Bearer <your_access_token>"
-                )
-            }
-        }
-    }
-    Swagger(app,template = swagger_template)
-    
+
+    Swagger(app, template=swagger_template)
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(task_bp)
-    
+
     @app.route("/")
     def home():
         return {
@@ -51,4 +31,5 @@ def create_app():
             "project": "Enterprise Task Management API",
             "docs": "/apidocs/"
         }, 200
+
     return app
