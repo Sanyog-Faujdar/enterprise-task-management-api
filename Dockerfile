@@ -13,4 +13,7 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["sh", "-c", "flask --app run.py db upgrade && python run.py"]
+COPY start.sh .
+RUN chmod +x start.sh
+
+CMD ["./start.sh"]
